@@ -9,6 +9,8 @@ public static class DependencyInjection
     {
         services.AddScoped<IReportGenerator, ReportGenerator>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IBotManager, BotManager>();
+
         return services;
     }
 }
