@@ -6,7 +6,7 @@ namespace MarjonBot.Application.Services;
 
 internal sealed class ReportGenerator : IReportGenerator
 {
-    public MemoryStream Generate(List<Report> reports)
+    public async Task<Stream> GenerateAsync(List<Report> reports)
     {
         using var excelEngine = new ExcelEngine();
         IApplication application = excelEngine.Excel;
@@ -21,7 +21,7 @@ internal sealed class ReportGenerator : IReportGenerator
         workbook.SaveAs(stream);
         stream.Position = 0;
 
-        return stream;
+        return await Task.FromResult(stream);
     }
 
     private static void SheetFormat(IWorksheet worksheet, List<Report> reports)

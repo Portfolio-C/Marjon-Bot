@@ -4,5 +4,5 @@ namespace MarjonBot.Application.Interfaces;
 
 public interface IReportGenerator
 {
-    public MemoryStream Generate(List<Report> report);
+    public Task<Stream> GenerateAsync(List<Report> report);
 }

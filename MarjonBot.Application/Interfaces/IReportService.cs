@@ -2,5 +2,5 @@
 
 public interface IReportService
 {
-    public Task<MemoryStream> GenerateReportAsync();
+    public Task<Stream> GenerateReportAsync();
 }

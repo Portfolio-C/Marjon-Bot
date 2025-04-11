@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="29.1.37" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MarjonBot.Domain\MarjonBot.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
