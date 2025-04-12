@@ -3,15 +3,20 @@ using MarjonBot.Domain.Entities;
 
 namespace MarjonBot.Application.Services;
 
-internal sealed class ReportService(IReportGenerator reportGenerator) : IReportService
+internal sealed class ReportService : IReportService
 {
-    public Task<MemoryStream> GenerateReportAsync()
+    private readonly IReportGenerator _reportGenerator;
+
+    public ReportService(IReportGenerator reportGenerator)
+    {
+        _reportGenerator = reportGenerator ?? throw new ArgumentNullException(nameof(reportGenerator));
+    }
+
+    public async Task<Stream> GenerateReportAsync()
     {
         var datas = GenerateMockReport();
 
-        var report = reportGenerator.Generate(datas);
-
-        return Task.FromResult(report);
+        return await _reportGenerator.GenerateAsync(datas);
     }
 
     private List<Report> GenerateMockReport()
