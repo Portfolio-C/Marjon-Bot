@@ -35,7 +35,7 @@ public class BotHandler
 
             try
             {
-                using var stream = await reportService.GenerateReportAsync();
+                using var stream = await reportService!.GenerateReportAsync();
 
                 if (stream.Length == 0)
                 {

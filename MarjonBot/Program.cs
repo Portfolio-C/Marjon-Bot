@@ -16,18 +16,20 @@ internal class Program
 
         var botHandler = serviceProvider.GetService<BotHandler>();
         var bot = serviceProvider.GetService<ITelegramBotClient>();
+        var reportScheduler = serviceProvider.GetService<WeeklyReport>();
+        reportScheduler!.Start();
 
-        bot.StartReceiving(
+        bot!.StartReceiving(
             updateHandler: async (botClient, update, cancellationToken) =>
             {
                 if (update.Message is { } message)
                 {
-                    await botHandler.OnMessage(message, update.Type);
+                    await botHandler!.OnMessage(message, update.Type);
                 }
             },
-            errorHandler: async (botHandler, exceprion, cancellationToken) =>
+            errorHandler: (botHandler, exception, cancellationToken) =>
             {
-                Console.WriteLine($"Xato: {exceprion.Message}");
+                Console.WriteLine($"Xato: {exception.Message}");
             });
 
 
