@@ -1,4 +1,3 @@
-﻿// WeeklyReport.cs
 using MarjonBot.Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
