@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MarjonBot;
 
@@ -17,41 +18,73 @@ public class BotHandler
         _serviceProvider = service ?? throw new ArgumentNullException(nameof(service));
     }
 
-    public async Task OnMessage(Message msg, UpdateType type)
+    public async Task OnUpdate(Update update, UpdateType type)
     {
-        if (msg.Text is null)
+        switch (update.Type)
         {
-            return;
+            case UpdateType.Message:
+                if (update.Message is not null)
+                    await OnMessage(update.Message);
+                break;
+            case UpdateType.CallbackQuery:
+                if (update.CallbackQuery is not null)
+                    await OnCallbackQuery(update.CallbackQuery);
+                break;
         }
 
+    }
+
+    private async Task OnMessage(Message msg)
+    {
         if (msg.Text.ToLower() == "/start")
         {
-            await _bot.SendMessage(msg.Chat.Id, "Hello! I'm your bot. How can I assist you today?");
+            var inlineKeyboard = new InlineKeyboardMarkup(new[]
+            {
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData("Reportlarni olish","get_reports")
+                }
+            });
+            await _bot.SendMessage(msg.Chat.Id, "Assalomu aleykum! Reportlarni olish uchun quyidagi tugmani bosing", replyMarkup: inlineKeyboard);
         }
         else if (msg.Text.ToLower() == "/report")
         {
-            using var scope = _serviceProvider.CreateScope();
-            var reportService = scope.ServiceProvider.GetService<IBotManager>();
-
-            try
-            {
-                using var stream = await reportService!.GenerateReportAsync();
-
-                if (stream.Length == 0)
-                {
-                    await _bot.SendMessage(msg.Chat.Id, "Hisobot fayli bo'sh. Iltimos, qayta urinib ko'ring.");
-                    return;
-                }
-                await _bot.SendDocument(msg.Chat.Id, InputFile.FromStream(stream, $"report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"));
-            }
-            catch (Exception ex)
-            {
-                await _bot.SendMessage(msg.Chat.Id, $"Xatolik yuz berdi: {ex.Message}");
-            }
+            await GetReports(msg.Chat.Id);
         }
         else
         {
-            await _bot.SendMessage(msg.Chat.Id, "salom!");
+            await _bot.SendMessage(msg.Chat.Id, "/start yoki /report ni bosing!");
+        }
+    }
+
+    private async Task OnCallbackQuery(CallbackQuery callback)
+    {
+        if (callback.Data == "get_reports")
+        {
+            await GetReports(callback.Message!.Chat.Id);
+        }
+    }
+
+
+    private async Task GetReports(long chatId)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var reportService = scope.ServiceProvider.GetService<IBotManager>();
+
+        try
+        {
+            using var stream = await reportService.GenerateReportAsync();
+            if (stream.Length == 0)
+            {
+                await _bot.SendMessage(chatId, "Hisobot fayli bo'sh. Iltimos, qayta urinib ko'ring.");
+                return;
+            }
+
+            await _bot.SendDocument(chatId, InputFile.FromStream(stream, $"report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"));
+        }
+        catch (Exception ex)
+        {
+            await _bot.SendMessage(chatId, $"Xatolik yuz berdi: {ex.Message}");
         }
 
     }

@@ -7,7 +7,6 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("");
 
         var services = new ServiceCollection();
         var serviceProvider = services
@@ -22,9 +21,11 @@ internal class Program
         bot!.StartReceiving(
             updateHandler: async (botClient, update, cancellationToken) =>
             {
-                if (update.Message is { } message)
+                if (update is not null)
                 {
-                    await botHandler!.OnMessage(message, update.Type);
+
+                    await botHandler.OnUpdate(update, update.Type);
+
                 }
             },
             errorHandler: (botHandler, exception, cancellationToken) =>
