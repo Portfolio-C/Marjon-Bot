@@ -65,6 +65,7 @@ public class BotHandler
         }
     }
 
+
     private async Task GetReports(long chatId)
     {
         using var scope = _serviceProvider.CreateScope();
