@@ -53,7 +53,7 @@ public class BotHandler
         }
         else
         {
-            await _bot.SendMessage(msg.Chat.Id, "salom!");
+            await _bot.SendMessage(msg.Chat.Id, "/start yoki /report ni bosing!");
         }
     }
 
