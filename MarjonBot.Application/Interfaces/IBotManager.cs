@@ -2,5 +2,5 @@
 
 public interface IBotManager
 {
-    Task<MemoryStream> GenerateReportAsync();
+    Task<MemoryStream> GenerateReportAsync(long userId);
 }

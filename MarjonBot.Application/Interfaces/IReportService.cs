@@ -2,5 +2,5 @@
 
 public interface IReportService
 {
-    public Task<Stream> GenerateReportAsync();
+    public Task<Stream> GenerateReportAsync(long userId);
 }

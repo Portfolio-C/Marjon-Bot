@@ -18,14 +18,14 @@ internal static class GetReport
                 await botClient.SendMessage(chatId, "Hisobot xizmati topilmadi. Iltimos, administrator bilan bog'laning.");
                 return;
             }
-            using var stream = await reportService.GenerateReportAsync();
+            using var stream = await reportService.GenerateReportAsync(chatId);
             if (stream.Length == 0)
             {
                 await botClient.SendMessage(chatId, "Hisobot fayli bo'sh. Iltimos, qayta urinib ko'ring.");
                 return;
             }
 
-            await botClient.SendDocument(chatId, InputFile.FromStream(stream, $"report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"));
+            await botClient.SendDocument(chatId, InputFile.FromStream(stream, $"report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"), "Example text qwerty");
         }
         catch (Exception ex)
         {
