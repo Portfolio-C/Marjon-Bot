@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using MarjonBot.Application.Interfaces;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -10,12 +11,14 @@ public class BotHandler
     private readonly IServiceProvider _serviceProvider;
     private readonly MessageHandler _messageHandler;
     private readonly CallbackQueryHandler _callbackQueryHandler;
+    private readonly IApiService _apiService;
 
-    public BotHandler(ITelegramBotClient bot, IServiceProvider service)
+    public BotHandler(ITelegramBotClient bot, IServiceProvider service, IApiService apiService)
     {
         _bot = bot ?? throw new ArgumentNullException(nameof(bot));
         _serviceProvider = service ?? throw new ArgumentNullException(nameof(service));
-        _messageHandler = new MessageHandler(_bot, _serviceProvider);
+        _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
+        _messageHandler = new MessageHandler(_bot, _serviceProvider, _apiService);
         _callbackQueryHandler = new CallbackQueryHandler(_bot, _serviceProvider);
     }
 

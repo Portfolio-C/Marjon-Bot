@@ -25,7 +25,7 @@ internal static class GetReport
                 return;
             }
 
-            await botClient.SendDocument(chatId, InputFile.FromStream(stream, $"report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"), "Example text qwerty");
+            await botClient.SendDocument(chatId, InputFile.FromStream(stream, $"report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"));
         }
         catch (Exception ex)
         {
