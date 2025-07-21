@@ -32,13 +32,12 @@ internal sealed class MessageHandler(ITelegramBotClient botClient, IServiceProvi
 
     private static Task<Message> StartCommand(long chatId, ITelegramBotClient client)
     {
-        var inlineKeyboard = new InlineKeyboardMarkup(new[]
-           {
-                new[]
-                {
+        var inlineKeyboard = new InlineKeyboardMarkup(
+           [
+                [
                     InlineKeyboardButton.WithCallbackData("Reportlarni olish","get_reports")
-                }
-            });
+                ]
+            ]);
 
         return client.SendMessage(
             chatId,
@@ -48,13 +47,12 @@ internal sealed class MessageHandler(ITelegramBotClient botClient, IServiceProvi
 
     private static Task<Message> OnDefaultMessage(long chatId, ITelegramBotClient client)
     {
-        var inlineKeyboard = new InlineKeyboardMarkup(new[]
-          {
-                new[]
-                {
+        var inlineKeyboard = new InlineKeyboardMarkup(
+          [
+                [
                     InlineKeyboardButton.WithCallbackData("Reportlarni olish","get_reports")
-                }
-            });
+                ]
+            ]);
 
         return client.SendMessage(
             chatId,
