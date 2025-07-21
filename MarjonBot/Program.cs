@@ -1,40 +1,66 @@
-﻿using MarjonBot;
-using MarjonBot.Extensions;
+﻿using Hangfire;
+using Hangfire.MemoryStorage;
+using MarjonBot.Application.Extensions;
+using MarjonBot.Application.Handlers;
+using MarjonBot.Application.Jobs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 
-internal class Program
-{
-    private static async Task Main(string[] args)
+var host = Host.CreateDefaultBuilder(args)
+     .ConfigureAppConfiguration(config =>
+     {
+         config.SetBasePath(Directory.GetCurrentDirectory());
+         config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+     })
+    .ConfigureServices((context, services) =>
     {
+        var configuration = context.Configuration;
 
-        var services = new ServiceCollection();
-        var serviceProvider = services
-            .ConfigureServices()
-            .BuildServiceProvider();
+        if (configuration == null)
+        {
+            throw new ArgumentNullException(nameof(configuration), "Configuration cannot be null");
+        }
 
-        var botHandler = serviceProvider.GetService<BotHandler>();
-        var bot = serviceProvider.GetService<ITelegramBotClient>();
-        var reportScheduler = serviceProvider.GetService<WeeklyReport>();
-        reportScheduler!.Start();
+        services.AddApplication();
 
-        bot!.StartReceiving(
-            updateHandler: async (botClient, update, cancellationToken) =>
-            {
-                if (update is not null)
-                {
+        services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(configuration["TelegramBot:Token"]!));
+        services.AddSingleton<BotHandler>();
 
-                    await botHandler.OnUpdate(update, update.Type);
-
-                }
-            },
-            errorHandler: (botHandler, exception, cancellationToken) =>
-            {
-                Console.WriteLine($"Xato: {exception.Message}");
-            });
+        services.AddHangfire(cfg => cfg.UseMemoryStorage());
+        services.AddHangfireServer();
+    })
+    .Build();
 
 
-        Console.WriteLine("Bot ishga tushdi...");
-        await Task.Delay(-1);
-    }
-}
+// Register Syncfusion license
+var configuration = host.Services.GetRequiredService<IConfiguration>();
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(configuration["Syncfusion:LicenseKey"]);
+
+// Resolve services
+var bot = host.Services.GetRequiredService<ITelegramBotClient>();
+var botHandler = host.Services.GetRequiredService<BotHandler>();
+var weeklyReport = host.Services.GetRequiredService<WeeklyReportJob>();
+
+var recurringJobManager = host.Services.GetRequiredService<IRecurringJobManager>();
+
+// Configure Hangfire
+RecurringJob.AddOrUpdate(
+    "weekly-report",
+    () => weeklyReport.SendWeeklyJobAsync(),
+    Cron.Minutely());
+
+// Start the bot
+bot!.StartReceiving(
+    updateHandler: async (botClient, update, cancellationToken) =>
+    {
+        if (update != null)
+            await botHandler.OnUpdate(update);
+    },
+    errorHandler: ErrorHandler.HandleAsync
+);
+
+Console.WriteLine("Bot ishga tushdi...");
+await host.RunAsync();
+await Task.Delay(-1);
