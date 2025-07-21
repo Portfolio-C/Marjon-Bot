@@ -29,7 +29,7 @@ internal sealed class ReportService(IReportGenerator reportGenerator) : IReportS
                 MilleageForTheWeek = _faker.Random.Int(400, 3000),
                 ContactPerKm = _faker.Random.Int(50, 300),
                 NumberOfContactsPerWeek = _faker.Random.Int(5000, 50000),
-                MonthlyPaymentAmount = _faker.Random.Int(10000, 100000),
+                MonthlyPaymentAmount = _faker.Random.Double(10000, 100000),
             });
         }
 

@@ -1,5 +1,6 @@
 ﻿using MarjonBot.Application.Interfaces;
 using MarjonBot.Application.Jobs;
+using MarjonBot.Application.Services;
 using MarjonBot.Application.Services.Bot;
 using MarjonBot.Application.Services.Reports;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,9 @@ public static class DependencyInjection
         services.AddScoped<IReportGenerator, ReportGenerator>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IBotManager, BotManager>();
+        services.AddScoped<IApiService, ApiService>();
         services.AddSingleton<WeeklyReportJob>();
+        services.AddSingleton<HttpClient>();
 
         return services;
     }

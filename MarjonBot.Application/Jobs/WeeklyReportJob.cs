@@ -8,7 +8,7 @@ public sealed class WeeklyReportJob(IBotManager botManager, ITelegramBotClient b
 {
     public async Task SendWeeklyJobAsync()
     {
-        List<long> userIds = [123456789, 987654321]; // userIds should be fetched from a database or configuration
+        List<long> userIds = [609294639]; // userIds should be fetched from a database or configuration
 
         foreach (var userId in userIds)
         {
