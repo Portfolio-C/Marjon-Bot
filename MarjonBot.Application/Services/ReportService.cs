@@ -2,7 +2,7 @@
 using MarjonBot.Application.Interfaces;
 using MarjonBot.Domain.Entities;
 
-namespace MarjonBot.Application.Services.Reports;
+namespace MarjonBot.Application.Services;
 
 internal sealed class ReportService(IReportGenerator reportGenerator) : IReportService
 {

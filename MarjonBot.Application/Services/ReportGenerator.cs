@@ -2,7 +2,7 @@
 using MarjonBot.Domain.Entities;
 using Syncfusion.XlsIO;
 
-namespace MarjonBot.Application.Services.Reports;
+namespace MarjonBot.Application.Services;
 
 internal sealed class ReportGenerator : IReportGenerator
 {

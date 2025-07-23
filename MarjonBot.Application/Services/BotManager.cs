@@ -1,6 +1,6 @@
 ﻿using MarjonBot.Application.Interfaces;
 
-namespace MarjonBot.Application.Services.Bot;
+namespace MarjonBot.Application.Services;
 
 internal sealed class BotManager(IReportService reportService) : IBotManager
 {
