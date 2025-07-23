@@ -4,12 +4,12 @@ using MarjonBot.Domain.Entities;
 
 namespace MarjonBot.Application.Services;
 
-internal sealed class ReportService(IReportGenerator reportGenerator) : IReportService
+internal sealed class ReportService(IReportGenerator reportGenerator, IApiService apiService) : IReportService
 {
     private readonly Faker _faker = new("ru");
     public async Task<Stream> GenerateReportAsync(long userId)
     {
-        var datas = GenerateMockReport(userId);
+        var datas = await apiService.GetReports(userId);
 
         return await reportGenerator.GenerateAsync(datas);
     }

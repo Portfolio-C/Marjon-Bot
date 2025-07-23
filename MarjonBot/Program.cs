@@ -49,7 +49,7 @@ var recurringJobManager = host.Services.GetRequiredService<IRecurringJobManager>
 RecurringJob.AddOrUpdate(
     "weekly-report",
     () => weeklyReport.SendWeeklyJobAsync(),
-    Cron.Minutely());
+    Cron.Daily());
 
 // Start the bot
 bot!.StartReceiving(

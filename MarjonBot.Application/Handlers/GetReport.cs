@@ -29,7 +29,11 @@ internal static class GetReport
         }
         catch (Exception ex)
         {
-            await botClient.SendMessage(chatId, $"Xatolik yuz berdi: {ex.Message}");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(ex.Message);
+            Console.ResetColor();
+
+            await botClient.SendMessage(chatId, $"Xatolik yuz berdi");
         }
     }
 }

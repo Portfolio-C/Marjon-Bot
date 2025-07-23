@@ -1,8 +1,6 @@
 ﻿using MarjonBot.Application.Interfaces;
 using MarjonBot.Application.Jobs;
 using MarjonBot.Application.Services;
-using MarjonBot.Application.Services.Bot;
-using MarjonBot.Application.Services.Reports;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MarjonBot.Application.Extensions;

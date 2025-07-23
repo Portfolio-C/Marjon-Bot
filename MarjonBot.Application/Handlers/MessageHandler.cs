@@ -47,21 +47,20 @@ internal sealed class MessageHandler(ITelegramBotClient botClient, IServiceProvi
         {
             return client.SendMessage(
                 chatId,
-                "Assalomu alaykum! Tizimga kirish uchun telefon raqamingizni va tizimdagi parolizni yozib yuboring" +
-                "namuna:\n+998994566543\nsizning parolingiz");
+"                👋 Assalomu alaykum! Tizimga kirish uchun quyidagicha formatda telefon raqamingiz va parolingizni yuboring:\n📱 +998994566543\n🔐 sizning_parolingiz");
 
         }
 
         var inlineKeyboard = new InlineKeyboardMarkup(
            [
                 [
-                    InlineKeyboardButton.WithCallbackData("Reportlarni olish","get_reports")
+                    InlineKeyboardButton.WithCallbackData("📊 Hisobotlarni yuklab olish","get_reports")
                 ]
             ]);
 
         return client.SendMessage(
             chatId,
-            "Assalomu alaykum! Reportlarni olish uchun quyidagi tugmani bosing",
+            "Assalomu alaykum! 📊 Hisobotlarni yuklab olish uchun quyidagi tugmani bosing",
             replyMarkup: inlineKeyboard);
     }
 
