@@ -1,41 +1,100 @@
-﻿using MarjonBot.Application.Interfaces;
+﻿using MarjonBot.Application.Extensions;
+using MarjonBot.Application.Interfaces;
 using MarjonBot.Domain.Entities;
+using MarjonBot.Domain.Responses;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using System.Net.Http.Headers;
 using System.Text;
 
 namespace MarjonBot.Application.Services;
 internal class ApiService(HttpClient httpClient, IConfiguration configuration) : IApiService
 {
-
-    public async Task<List<Report>> GetCarLogsAsync()
+    public async Task<List<Report>> GetReports(long userId)
     {
-        var response = await httpClient.GetAsync("https://marjon.uz/api/app/v1/users/Login/");
-        response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadAsStringAsync();
+        var cars = await GetUserCarsList();
+        //var carLogs = await GetCarLogsListAsync();
 
-        // Report bu o'zim excelga moslab yozgan modelim API dan malumotlarni topolmaganim uchun 
-        return JsonConvert.DeserializeObject<List<Report>>(content) ?? [];
-    }
+        var reports = new List<Report>();
 
-    public Task<Report> GetReports(long userId)
-    {
-        throw new NotImplementedException();
+        foreach (var car in cars)
+        {
+            //  var log = carLogs.FirstOrDefault(x => x.CarId == car.Id);
+
+            int mileage = 12345;
+            int contactPerKm = 150; // Simulated contact per km, can be replaced with actual logic
+            double monthlyPayment = 150000; // Simulated monthly payment, can be replaced with actual logic
+
+            reports.Add(new Report
+            {
+                UserId = userId,
+                Id = car.Id,
+                CarNumber = car.StateNumber,
+                CarModel = car.Model.Title,
+                MilleageForTheWeek = mileage,
+                ContactPerKm = contactPerKm,
+                NumberOfContactsPerWeek = contactPerKm * mileage,
+                MonthlyPaymentAmount = monthlyPayment,
+                CostOfOneContact = (decimal)monthlyPayment / (contactPerKm * mileage),
+            });
+        }
+
+        return reports;
     }
 
     public async Task<bool> LoginAsync(LoginDto request)
     {
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(configuration["Api:Token"]!);
-
         var json = JsonConvert.SerializeObject(request);
-
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var response = await httpClient.PostAsync("https://marjon.uz/api/app/v1/users/Login/", content);
 
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"❌ Login failed: {error}");
+            Console.ResetColor();
+
+            return false;
+        }
+
+        await UpdateTokenAsync(response);
+
+        return true;
+    }
+
+    public async Task<List<Car>> GetUserCarsList()
+    {
+        TokenManager.AddAuthorizationHeader(httpClient, configuration);
+
+        var response = await httpClient.GetAsync("https://marjon.uz/api/app/v1/cars/MyCarList/");
         response.EnsureSuccessStatusCode();
 
-        return response.IsSuccessStatusCode;
+        var jsonResponse = await response.Content.ReadAsStringAsync();
+        var myCars = JsonConvert.DeserializeObject<MyCarListResponse>(jsonResponse);
+
+        return myCars.Cars;
+    }
+
+    public async Task<List<CarLogsListResponse>> GetCarLogsListAsync()
+    {
+        TokenManager.AddAuthorizationHeader(httpClient, configuration);
+
+        var response = await httpClient.GetAsync("https://marjon.uz/api/app/v1/cars/CarLogsList/");
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsStringAsync();
+        var cars = JsonConvert.DeserializeObject<List<CarLogsListResponse>>(json);
+
+        return cars ?? [];
+    }
+
+    private async static Task UpdateTokenAsync(HttpResponseMessage response)
+    {
+        var responseString = await response.Content.ReadAsStringAsync();
+        var responseJson = JsonConvert.DeserializeObject<LoginResponse>(responseString)
+            ?? throw new Exception("Failed to deserialize login response");
+
+        await TokenManager.UpdateAccessTokenAsync(responseJson.Token, "appsettings.json");
     }
 }
