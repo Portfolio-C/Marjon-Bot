@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace MarjonBot.Domain.Entities;
+
 public class LoginDto
 {
     [JsonProperty("phone_number")]
